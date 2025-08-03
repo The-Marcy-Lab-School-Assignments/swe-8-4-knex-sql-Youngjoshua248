@@ -3,35 +3,26 @@ const {
   truncate,
   closeConnection,
   insertMultipleBooks,
-} = require('./starter-queries');
-
-const {
-  dangerousDynamicQuery,
-  // safeDynamicQuery,
-  // multipleDynamicParamsQuery,
-} = require('./dynamic-queries');
+  selectBooksByGenre,
+} = require("./starter-queries");
 
 const main = async () => {
-  await createTable().catch(() => 'Table created');
+  await createTable().catch(() => "Table created");
   await insertMultipleBooks();
 
-  // These are already filled out, but we encourage you
-  // to play around with them!
-
-  /* This is why we don't use straight string interpolation! */
+  // 🔓 Dangerous — watch the hack in action
   await dangerousDynamicQuery();
 
-  /* These are safe because we use parameterized queries
-  which are sanitized by knex */
-  // await safeDynamicQuery(2);
-  // await multipleDynamicParamsQuery(100, true);
+  // 🔐 Safe queries using parameterized input
+  const safeResult = await safeDynamicQuery(2);
+  console.log("Safe Result (id = 2):", safeResult);
 
-  // We remove the table rows (not the table) so we can run the queries again
-  // without the database getting too big
+  const filtered = await multipleDynamicParamsQuery(100, true);
+  console.log("Filtered Books (pages > 100 & is_movie = true):", filtered);
+
+  const classics = await selectBooksByGenre("Classic");
+  console.log("Books in genre 'Classic':", classics);
+
   await truncate();
-
-  // We have to close the connection when we're done
   closeConnection();
 };
-
-main();
